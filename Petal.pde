@@ -3,7 +3,11 @@ class Petal {
 	float locY;
 	float h;
 	float w;
-	float waitCounts;
+	
+	int waitCounts;
+	int waitVar;
+	int waitCoeff;
+
 	int counter;
 	int closeCounts;
 	int openCounts;
@@ -17,32 +21,38 @@ class Petal {
 		counter = 0;
 		closeCounts = 50;
 		openCounts = 50;
-		waitCounts = _waitTime;
+		waitCoeff = _waitTime;
 
+	}
+
+	void setWaitTime(int _waiter)
+	{
+		waitVar = _waiter;
+		waitCounts = waitCoeff + waitVar;
 	}
 
 	void update()
 	{
-		//increment counter
 		
-		println(counter);
+		
 
 		//close the petal
 		if(counter > 0 && counter < closeCounts)
 		{
 			w = w - 1;
 		}
-
+		//open the petal
 		if(counter > closeCounts && counter < closeCounts + openCounts)
 		{
 			w = w + 1;
 		}
-
+		//wait and then reset
 		if(counter >= (closeCounts + openCounts + waitCounts))
 		{
 			counter = 0;
 		}
 
+		//increment counter
 		counter++;
 
 		
