@@ -19,68 +19,108 @@ public class solar_petals extends PApplet {
 
 
 
-int boxW = 1000;
-int boxH = 500;
-int xSpacing = 60;
-int ySpacing = 30;
-int rate = 0;
+int boxW = 1000;		//width of bounding box
+int boxH = 500;			//height of bounding box
+int xSpacing = 60;		//horizontal spacing
+int ySpacing = 30;		//vertical spacing
+int waitTime = 0;			//time/rate variable 
+int maxWait = 500; 		//set a max for time/rate variable
 
-int col = boxW / xSpacing;
-int row = boxH / ySpacing;
-int numPetals = col * row;
+int col = boxW / xSpacing;		//number of columns
+int row = boxH / ySpacing;		//number of rows
+int numPetals = col * row;		//total number of petals
+int numPetalsOn = 0;			//keep track of how many petals are being powered
+boolean changeColor = false;
 
+//make room for petals
 Petal[] petals = new Petal[numPetals];
 
-ControlP5 cp5;                //initiate instance of ControlP5 library
+ControlP5 cp5;                //make room for instance of ControlP5 library
 
 
+
+//////////////////// SETUP /////////////////////////////////
 public void setup()
 {
 	size(displayWidth, displayHeight);
+	
+	//initialize new petals with a random wait time
 	for(int i = 0; i < numPetals; i++)
 	{
-		int waiter = (int)random(0, 100);
-		petals[i] = new Petal(waiter);
+		int initialWaitTime = (int)random(0, 200);
+		petals[i] = new Petal(initialWaitTime);
 	}
 
+	//initialize GUI
 	cp5 = new ControlP5(this);
 
-	//slider control for gravity
-	cp5.addSlider("rate")
+	//slider control for waitTime
+	cp5.addSlider("waitTime")
 	    .setPosition(boxW, 30)
-	      .setRange(0, 200)
+	      .setRange(0, maxWait)
 	        .setSize(20, 400)
-	          .setColorCaptionLabel(255)
-	            .setCaptionLabel("rate")
+	          //.setColorCaptionLabel(255)
+	            .setCaptionLabel("waitTime")
 	              ;
+    // create a toggle
+	cp5.addToggle("changeColor")
+     	.setPosition(boxW + 45 ,410)
+     	  .setSize(20,20)
+     	    .setCaptionLabel("colorChange")
+     ;
 }
 
+
+//////////////////// DRAW /////////////////////////////////
 public void draw()
 {
-	background(0);
+	background(80);
+	
 	
 	cp5.show();
 
-	
-	fill(255);
+	//draw the petals
+	noFill();
+	stroke(150, 150, 150);
+	rect(0,0,boxW-20, boxH);
+	noStroke();
 	
 		for(int i = 1; i < col; i++)
 		{
 			for(int j = 1; j < row; j ++)
 			{
 				pushMatrix();
-				translate(i*xSpacing, j*ySpacing);
-				petals[i*j].display();
+					translate(i*xSpacing, j*ySpacing);
+					petals[i*j].display(changeColor);
 				popMatrix();
 
 			}
 		}
 	
+	//do other things with the petals
 	for(int i= 0; i < numPetals; i++)
 	{
+		//update petals
 		petals[i].update();
-		petals[i].setWaitTime(200 - rate);
+		//change the wait time between closes
+		petals[i].setWaitTime(maxWait - waitTime);
+
+
+		//get a count of how many petals are currently "on"
+		if(petals[i].state == true && petals[i].prevState == false)
+		{
+			numPetalsOn++;
+		}
+		if(petals[i].state == false && petals[i].prevState == true)
+		{
+			numPetalsOn--;
+		}
+
 	}
+
+	//write out the number of petals that are on
+	fill(255, 255, 255);
+	text("number of petals on: " + numPetalsOn, boxW , boxH); 
 
 
 	
@@ -99,6 +139,8 @@ class Petal {
 	int counter;
 	int closeCounts;
 	int openCounts;
+	boolean state;
+	boolean prevState;
 
 	Petal(int _waitTime)
 	{
@@ -107,9 +149,11 @@ class Petal {
 		h = 20;
 		w = 60;
 		counter = 0;
-		closeCounts = 50;
-		openCounts = 50;
+		closeCounts = 70;
+		openCounts = 90;
 		waitCoeff = _waitTime;
+		state = false;
+
 
 	}
 
@@ -123,31 +167,65 @@ class Petal {
 	{
 		
 		
-
+		prevState = state;
 		//close the petal
 		if(counter > 0 && counter < closeCounts)
 		{
-			w = w - 1;
+			
+			state = true;
+			
+			w = w - 0.5f;
 		}
 		//open the petal
 		if(counter > closeCounts && counter < closeCounts + openCounts)
 		{
-			w = w + 1;
+			
+			state = false;
+			
+			w = w + 0.5f;
 		}
 		//wait and then reset
 		if(counter >= (closeCounts + openCounts + waitCounts))
 		{
+			
+			state = false;
+			
 			counter = 0;
 		}
 
 		//increment counter
 		counter++;
 
-		
+		if(w > 60)
+		{
+			w = 60;
+		}
+		if(w <= 20)
+		{
+			w = 20;
+		}
+
+		if(prevState == false && state == true)
+		{
+			println("turnedOn");
+		}
+		if(prevState == true && state == false)
+		{
+			println("turnedOFF");
+		}
+
+		//println("state: " + state + " prevState: " + prevState);
 	}
 
-	public void display()
+	public void display(boolean changeColor)
 	{
+		
+		if(state && changeColor)
+		{
+			fill(170);
+		}else{
+			fill(200);
+		}
 		ellipse(locX, locY, w, h);
 
 	}
