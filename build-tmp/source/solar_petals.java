@@ -24,7 +24,7 @@ int boxH = 500;			//height of bounding box
 int xSpacing = 60;		//horizontal spacing
 int ySpacing = 30;		//vertical spacing
 int waitTime = 0;			//time/rate variable 
-int maxWait = 500; 		//set a max for time/rate variable
+int maxWait = 2000; 		//set a max for time/rate variable
 
 int col = boxW / xSpacing;		//number of columns
 int row = boxH / ySpacing;		//number of rows
@@ -60,13 +60,13 @@ public void setup()
 	      .setRange(0, maxWait)
 	        .setSize(20, 400)
 	          //.setColorCaptionLabel(255)
-	            .setCaptionLabel("waitTime")
+	            .setCaptionLabel("rate")
 	              ;
     // create a toggle
 	cp5.addToggle("changeColor")
      	.setPosition(boxW + 45 ,410)
      	  .setSize(20,20)
-     	    .setCaptionLabel("colorChange")
+     	    .setCaptionLabel("show ONs")
      ;
 }
 
@@ -121,6 +121,7 @@ public void draw()
 	//write out the number of petals that are on
 	fill(255, 255, 255);
 	text("number of petals on: " + numPetalsOn, boxW , boxH); 
+	text("current draw @ 4.5v: " + (int)(numPetalsOn * 0.65f), boxW, boxH + 13);
 
 
 	
@@ -151,60 +152,56 @@ class Petal {
 		counter = 0;
 		closeCounts = 70;
 		openCounts = 90;
-		waitCoeff = _waitTime;
+		//waitCoeff = _waitTime;
+		waitCounts =_waitTime;
 		state = false;
 
 
 	}
 
+	//function for changing wait time
 	public void setWaitTime(int _waiter)
 	{
 		waitVar = _waiter;
-		waitCounts = waitCoeff + waitVar;
+		//waitCounts = waitCoeff + waitVar;
 	}
 
 	public void update()
 	{
 		
-		
+		//prepare for any state changes
 		prevState = state;
+
 		//close the petal
 		if(counter > 0 && counter < closeCounts)
 		{
-			
 			state = true;
-			
 			w = w - 0.5f;
 		}
+
 		//open the petal
 		if(counter > closeCounts && counter < closeCounts + openCounts)
 		{
-			
-			state = false;
-			
+			state = false;	
 			w = w + 0.5f;
 		}
+
 		//wait and then reset
 		if(counter >= (closeCounts + openCounts + waitCounts))
 		{
-			
 			state = false;
-			
 			counter = 0;
+			waitCounts = (int)random(0,waitVar);
 		}
 
 		//increment counter
 		counter++;
 
-		if(w > 60)
-		{
-			w = 60;
-		}
-		if(w <= 20)
-		{
-			w = 20;
-		}
+		//constrain width
+		w = constrain(w, 20, 60);
 
+
+		//logging for turnOn and turn Off
 		if(prevState == false && state == true)
 		{
 			println("turnedOn");
@@ -214,7 +211,6 @@ class Petal {
 			println("turnedOFF");
 		}
 
-		//println("state: " + state + " prevState: " + prevState);
 	}
 
 	public void display(boolean changeColor)

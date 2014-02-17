@@ -6,7 +6,7 @@ int boxH = 500;			//height of bounding box
 int xSpacing = 60;		//horizontal spacing
 int ySpacing = 30;		//vertical spacing
 int waitTime = 0;			//time/rate variable 
-int maxWait = 500; 		//set a max for time/rate variable
+int maxWait = 2000; 		//set a max for time/rate variable
 
 int col = boxW / xSpacing;		//number of columns
 int row = boxH / ySpacing;		//number of rows
@@ -42,13 +42,13 @@ void setup()
 	      .setRange(0, maxWait)
 	        .setSize(20, 400)
 	          //.setColorCaptionLabel(255)
-	            .setCaptionLabel("waitTime")
+	            .setCaptionLabel("rate")
 	              ;
     // create a toggle
 	cp5.addToggle("changeColor")
      	.setPosition(boxW + 45 ,410)
      	  .setSize(20,20)
-     	    .setCaptionLabel("colorChange")
+     	    .setCaptionLabel("show ONs")
      ;
 }
 
@@ -103,6 +103,7 @@ void draw()
 	//write out the number of petals that are on
 	fill(255, 255, 255);
 	text("number of petals on: " + numPetalsOn, boxW , boxH); 
+	text("current draw @ 4.5v: " + (int)(numPetalsOn * 0.65), boxW, boxH + 13);
 
 
 	

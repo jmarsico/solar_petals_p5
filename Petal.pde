@@ -23,60 +23,56 @@ class Petal {
 		counter = 0;
 		closeCounts = 70;
 		openCounts = 90;
-		waitCoeff = _waitTime;
+		//waitCoeff = _waitTime;
+		waitCounts =_waitTime;
 		state = false;
 
 
 	}
 
+	//function for changing wait time
 	void setWaitTime(int _waiter)
 	{
 		waitVar = _waiter;
-		waitCounts = waitCoeff + waitVar;
+		//waitCounts = waitCoeff + waitVar;
 	}
 
 	void update()
 	{
 		
-		
+		//prepare for any state changes
 		prevState = state;
+
 		//close the petal
 		if(counter > 0 && counter < closeCounts)
 		{
-			
 			state = true;
-			
 			w = w - 0.5;
 		}
+
 		//open the petal
 		if(counter > closeCounts && counter < closeCounts + openCounts)
 		{
-			
-			state = false;
-			
+			state = false;	
 			w = w + 0.5;
 		}
+
 		//wait and then reset
 		if(counter >= (closeCounts + openCounts + waitCounts))
 		{
-			
 			state = false;
-			
 			counter = 0;
+			waitCounts = (int)random(0,waitVar);
 		}
 
 		//increment counter
 		counter++;
 
-		if(w > 60)
-		{
-			w = 60;
-		}
-		if(w <= 20)
-		{
-			w = 20;
-		}
+		//constrain width
+		w = constrain(w, 20, 60);
 
+
+		//logging for turnOn and turn Off
 		if(prevState == false && state == true)
 		{
 			println("turnedOn");
@@ -86,7 +82,6 @@ class Petal {
 			println("turnedOFF");
 		}
 
-		//println("state: " + state + " prevState: " + prevState);
 	}
 
 	void display(boolean changeColor)
